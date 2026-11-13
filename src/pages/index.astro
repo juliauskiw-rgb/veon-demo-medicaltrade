@@ -1,0 +1,292 @@
+---
+// Homepage DEMO «Відкритий стелаж складу» — design/concept.md, ux/demo-home.md. Facts: veon/client.json.
+import Base from "../layouts/Base.astro";
+import Section from "../components/Section.astro";
+import Header from "../components/Header.astro";
+import Shelf from "../components/Shelf.astro";
+import Icon from "../components/Icon.astro";
+import FutureLink from "../components/FutureLink.astro";
+import { Image } from "astro:assets";
+import logo from "../assets/logo.png";
+import {
+  company, phones, viber, whatsapp, hours, directions, heroShelf, consumables,
+  brands, payment, delivery, futurePages, legalPages,
+} from "../data/site";
+import "../styles/site.css";
+
+const title = "Медичне обладнання і витратні матеріали — Медікал Трейд ЛТД";
+const description = "Медичне й лабораторне обладнання, витратні матеріали для ЕКГ і УЗД з Івано-Франківська. Сервіс, оплата за рахунком, доставка по Україні.";
+const soon = "Розділ у розробці";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": ["Organization", "Store"],
+  name: company.legal,
+  alternateName: company.name,
+  telephone: phones.map((p) => p.intl),
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: company.address,
+    addressLocality: "Івано-Франківськ",
+    addressCountry: "UA",
+  },
+  areaServed: "UA",
+  openingHoursSpecification: hours.filter((h) => h.spec).map((h) => ({ "@type": "OpeningHoursSpecification", ...h.spec })),
+  sameAs: [company.facebook],
+};
+---
+<Base lang="uk" title={title} description={description}>
+  <Fragment slot="head">
+    <meta name="theme-color" content="#FFFFFF" />
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </Fragment>
+
+  <Header slot="header" />
+
+  <!-- 1 · hero -->
+  <Section id="hero" rec="W-R101,S-R-G003,M-R004,W-R201,W-R202,W-R203" class="hero">
+    <div class="hero__grid container">
+      <div class="hero__text">
+        <h1 class="hero__title">Медичне обладнання і витратні матеріали з Івано-Франківська з доставкою по всій Україні</h1>
+        <p class="hero__lead">Гарантійний і післягарантійний сервіс, навчання персоналу, оплата за рахунком для закладів.</p>
+        <div class="hero__cta">
+          <a class="btn btn--call btn--lg" href={phones[0].href}>
+            <Icon name="phone" />
+            <span>Зателефонувати <span class="nowrap">· {phones[0].short}</span></span>
+          </a>
+          <div class="hero__msg">
+            <a class="btn btn--outline btn--lg" href={viber}><Icon name="viber" /><span>Viber</span></a>
+            <a class="btn btn--outline btn--lg" href={whatsapp}><Icon name="whatsapp" /><span>WhatsApp</span></a>
+          </div>
+        </div>
+      </div>
+      <div class="hero__shelf">
+        <Shelf products={heroShelf} variant="hero" vw={[50, 125]} label="Товари зі складу" />
+      </div>
+    </div>
+    <nav class="hero__dirs container" aria-label="Напрями каталогу">
+      <ul role="list">
+        {directions.map((d) => <li><a href={`#dir-${d.id}`}>{d.title}</a></li>)}
+      </ul>
+    </nav>
+  </Section>
+
+  <!-- 2 · directions -->
+  <Section id="directions" rec="W-R102" class="section directions">
+    <div class="container">
+      <div class="section-head">
+        <span class="bar" data-reveal aria-hidden="true"></span>
+        <h2>Шість напрямів каталогу</h2>
+        <p class="section-head__lead">Від електрокардіографа до паперу для нього. Наявність і ціну конкретної моделі назве менеджер.</p>
+      </div>
+      <div class="dir-wall">
+        {directions.map((d, i) => (
+          <details class:list={["dir", `dir--${d.span}`]} id={`dir-${d.id}`} open data-dir>
+            <summary class="dir__head">
+              <span class="bar dir__bar" data-reveal aria-hidden="true" style={`--reveal-delay:${i * 60}ms`}></span>
+              <h3 class="dir__title">{d.title}</h3>
+              <Icon name="chevron" size={24} class="dir__chevron" />
+            </summary>
+            <div class="dir__body">
+              <p class="dir__items">{d.items}</p>
+              <div class="dir__actions">
+                <a class="link-action" href={viber}><Icon name="viber" size={18} /><span>Уточнити наявність</span></a>
+                {d.toConsumables
+                  ? <a class="link-quiet" href="#consumables">Ходові позиції нижче</a>
+                  : <FutureLink note={soon} class="link-quiet">Розділ каталогу</FutureLink>}
+              </div>
+            </div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </Section>
+
+  <!-- 3 · consumables -->
+  <Section id="consumables" rec="W-R205" class="section consumables">
+    <div class="consumables__grid container">
+      <div class="consumables__head">
+        <span class="bar" data-reveal aria-hidden="true"></span>
+        <h2>Витратні матеріали для функціональної діагностики</h2>
+        <p>Гель, електроди й папір, які докуповують регулярно. З Івано-Франківська — по всій Україні.</p>
+        <a class="btn btn--outline btn--lg" href={viber}><Icon name="viber" /><span>Замовити у Viber</span></a>
+        <a class="link-action" href={phones[0].href}><Icon name="phone" size={18} /><span>або {phones[0].short}</span></a>
+      </div>
+      <div class="consumables__shelf">
+        <Shelf products={consumables} variant="band" vw={[66, 230]} label="Витратні матеріали" />
+      </div>
+    </div>
+  </Section>
+
+  <!-- 4 · institutions -->
+  <Section id="institutions" rec="W-R107,S-R-G005,M-R005" class="institutions">
+    <div class="institutions__grid container">
+      <div class="institutions__head">
+        <h2>Для медичних закладів</h2>
+        <p class="institutions__lead">Оплата за рахунком, доставка по всій Україні, сервіс і навчання після покупки.</p>
+      </div>
+      <div class="institutions__lists">
+        <div>
+          <h3>Оплата</h3>
+          <ul role="list" class="big-list">{payment.map((p) => <li>{p}</li>)}</ul>
+        </div>
+        <div>
+          <h3>Доставка</h3>
+          <ul role="list" class="big-list">{delivery.map((p) => <li>{p}</li>)}</ul>
+        </div>
+      </div>
+      <div class="institutions__foot">
+        <p>Вартість і строки доставки уточнюйте в менеджера.</p>
+        <div class="institutions__cta">
+          <a class="btn btn--call btn--lg" href={phones[0].href}><Icon name="phone" /><span>Запросити рахунок</span></a>
+          <a class="btn btn--outline-light btn--lg" href={viber}><Icon name="viber" /><span>Рахунок у Viber</span></a>
+        </div>
+      </div>
+    </div>
+  </Section>
+
+  <!-- 5 · trust -->
+  <Section id="trust" rec="W-R103" class="section trust">
+    <div class="trust__grid container">
+      <div class="section-head trust__head">
+        <span class="bar" data-reveal aria-hidden="true"></span>
+        <h2>Офіційно і з сервісом</h2>
+        <p class="section-head__lead">Ми офіційно представляємо виробників медичного й лабораторного обладнання. Серед них:</p>
+      </div>
+      <ul role="list" class="brand-wall" aria-label="Виробники">
+        {brands.map((b) => <li class={`brand brand--${b.size}`}>{b.name}</li>)}
+      </ul>
+      <div class="trust__facts">
+        <div class="fact">
+          <h3>Гарантія і післягарантійний сервіс</h3>
+          <p>Обладнання, яке ви купили, обслуговуємо й після завершення гарантії.</p>
+        </div>
+        <div class="fact">
+          <h3>Навчання медперсоналу</h3>
+          <p>Показуємо лікарям і персоналу, як працювати з новим обладнанням.</p>
+        </div>
+        <div class="fact">
+          <h3>Працюємо з {company.since} року</h3>
+          <p>{company.legal}: офіс в Івано-Франківську, доставка по всій Україні.</p>
+        </div>
+      </div>
+    </div>
+  </Section>
+
+  <!-- 6 · contacts -->
+  <Section id="contacts" rec="W-R105" class="section contacts">
+    <div class="contacts__grid container">
+      <div class="section-head contacts__head">
+        <span class="bar" data-reveal aria-hidden="true"></span>
+        <h2>Контакти</h2>
+      </div>
+      <div class="contacts__phones">
+        <a class="phone-xl" href={phones[0].href}>{"+38 " + phones[0].display}</a>
+        <a class="phone-l" href={phones[1].href}>{"+38 " + phones[1].display}</a>
+        <div class="contacts__msg">
+          <a class="btn btn--outline btn--lg" href={viber}><Icon name="viber" /><span>Viber</span></a>
+          <a class="btn btn--outline btn--lg" href={whatsapp}><Icon name="whatsapp" /><span>WhatsApp</span></a>
+        </div>
+      </div>
+      <dl class="contacts__info">
+        <div>
+          <dt>Графік</dt>
+          <dd>
+            <ul role="list" class="hours">
+              {hours.map((h) => <li><span>{h.days}</span><span>{h.time}</span></li>)}
+            </ul>
+          </dd>
+        </div>
+        <div>
+          <dt>Офіс</dt>
+          <dd>
+            <address>{company.city},<br />{company.address}</address>
+            <a class="link-action" href={company.mapUrl} target="_blank" rel="noopener"><Icon name="pin" size={18} /><span>Відкрити на карті</span></a>
+          </dd>
+        </div>
+        <div>
+          <dt>Соцмережі</dt>
+          <dd><a class="link-action" href={company.facebook} target="_blank" rel="noopener"><Icon name="facebook" size={18} /><span>Facebook</span></a></dd>
+        </div>
+      </dl>
+    </div>
+  </Section>
+
+  <footer slot="footer" class="site-footer" data-rec="W-R105,S-R-S011">
+    <span class="shelf-line" aria-hidden="true"></span>
+    <div class="site-footer__grid container">
+      <div class="site-footer__brand">
+        <a class="logo" href="#hero" aria-label="Медікал Трейд ЛТД — на початок сторінки">
+          <Image src={logo} alt="" width={118} height={135} format="png" class="logo__img" />
+        </a>
+      </div>
+      <div>
+        <h2 class="site-footer__title">Каталог</h2>
+        <ul role="list">
+          {directions.map((d) => <li><FutureLink note={soon}>{d.title}</FutureLink></li>)}
+        </ul>
+      </div>
+      <div>
+        <h2 class="site-footer__title">Компанія</h2>
+        <ul role="list">
+          {[...futurePages, ...legalPages].map((p) => <li><FutureLink note={soon}>{p}</FutureLink></li>)}
+        </ul>
+      </div>
+      <div>
+        <h2 class="site-footer__title">Зв'язок</h2>
+        <ul role="list" class="site-footer__contacts">
+          {phones.map((p) => <li><a href={p.href}>+38 {p.display}</a></li>)}
+          <li><a href={viber}>Viber</a> · <a href={whatsapp}>WhatsApp</a></li>
+          <li>{hours.map((h) => `${h.days} ${h.time}`).join(", ")}</li>
+          <li>{company.city}, {company.address}</li>
+          <li><a href={company.facebook} target="_blank" rel="noopener">Facebook</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="site-footer__copy container">© 2026 {company.legal}</p>
+  </footer>
+
+  <nav slot="footer" class="call-bar" aria-label="Зв'язатися" data-rec="W-R102,S-R-G004">
+    <a class="call-bar__call" href={phones[0].href}><Icon name="phone" /><span>Подзвонити</span></a>
+    <a href={viber}><Icon name="viber" /><span>Viber</span></a>
+    <a href={whatsapp}><Icon name="whatsapp" /><span>WhatsApp</span></a>
+  </nav>
+</Base>
+
+<script>
+  // Mobile menu: close after an anchor tap and on Escape.
+  const menu = document.querySelector<HTMLDetailsElement>("[data-menu]");
+  if (menu) {
+    menu.querySelectorAll("[data-menu-link]").forEach((a) => a.addEventListener("click", () => { menu.open = false; }));
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && menu.open) { menu.open = false; menu.querySelector("summary")?.focus(); }
+    });
+    menu.addEventListener("toggle", () => document.documentElement.classList.toggle("menu-open", menu.open));
+  }
+
+  // Directions: an accordion on phones, always open from 768 px.
+  const mq = window.matchMedia("(max-width: 767px)");
+  const dirs = [...document.querySelectorAll<HTMLDetailsElement>("[data-dir]")];
+  const syncDirs = () => dirs.forEach((d, i) => { d.open = mq.matches ? i === 0 : true; });
+  syncDirs();
+  mq.addEventListener("change", syncDirs);
+  dirs.forEach((d) => d.querySelector("summary")?.addEventListener("click", (e) => { if (!mq.matches) e.preventDefault(); }));
+  // A direction link from the hero opens its item on phones.
+  document.querySelectorAll<HTMLAnchorElement>('a[href^="#dir-"]').forEach((a) => a.addEventListener("click", () => {
+    const t = document.querySelector<HTMLDetailsElement>(a.getAttribute("href") || "");
+    if (t) t.open = true;
+  }));
+
+  // Active anchor in the header: coral dot under the current section.
+  const links = [...document.querySelectorAll<HTMLAnchorElement>("[data-nav]")];
+  const targets = links.map((a) => document.querySelector<HTMLElement>(a.getAttribute("href") || "")).filter((x): x is HTMLElement => !!x);
+  if ("IntersectionObserver" in window && targets.length) {
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        links.forEach((a) => { if (a.getAttribute("href") === `#${e.target.id}`) a.setAttribute("aria-current", "true"); else a.removeAttribute("aria-current"); });
+      }
+    }, { rootMargin: "-45% 0px -50% 0px" });
+    targets.forEach((t) => io.observe(t));
+  }
+</script>

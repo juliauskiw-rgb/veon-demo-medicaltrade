@@ -1,0 +1,60 @@
+---
+// White header: logo → #hero, 5 anchors, phone + Viber (1440); logo, call icon and «Меню» (mobile). W-R102, W-R110.
+import { Image } from "astro:assets";
+import logo from "../assets/logo.png";
+import Icon from "./Icon.astro";
+import FutureLink from "./FutureLink.astro";
+import { nav, phones, viber, whatsapp, futurePages, hours } from "../data/site";
+const soon = "Розділ у розробці";
+---
+<header class="site-header" data-rec="W-R102,W-R110">
+  <div class="site-header__inner container">
+    <a class="logo" href="#hero" aria-label="Медікал Трейд ЛТД — на початок сторінки">
+      <Image src={logo} alt="" width={118} height={135} loading="eager" format="png" class="logo__img" />
+    </a>
+    <nav class="main-nav" aria-label="Розділи сторінки">
+      <ul role="list">
+        {nav.map((n) => <li><a href={n.href} data-nav>{n.label}</a></li>)}
+      </ul>
+    </nav>
+    <div class="header-actions">
+      <a class="header-phone" href={phones[0].href}>
+        <Icon name="phone" size={18} />
+        <span>{phones[0].short}</span>
+      </a>
+      <a class="btn btn--outline btn--sm header-viber" href={viber}>
+        <Icon name="viber" size={20} />
+        <span>Viber</span>
+      </a>
+      <a class="icon-btn header-call" href={phones[0].href} aria-label={`Зателефонувати ${phones[0].short}`}>
+        <Icon name="phone" size={22} />
+      </a>
+      <details class="menu" data-menu>
+        <summary class="menu__toggle">
+          <Icon name="menu" size={22} class="menu__icon-open" />
+          <Icon name="close" size={22} class="menu__icon-close" />
+          <span>Меню</span>
+        </summary>
+        <div class="menu__panel">
+          <nav aria-label="Меню">
+            <ul role="list" class="menu__anchors">
+              {nav.map((n) => <li><a href={n.href} data-menu-link>{n.label}</a></li>)}
+            </ul>
+            <ul role="list" class="menu__future">
+              {futurePages.map((p) => <li><FutureLink note={soon}>{p}</FutureLink></li>)}
+              <li><FutureLink note="Пошук по каталогу з'явиться в повній версії сайту">Пошук по каталогу</FutureLink></li>
+            </ul>
+          </nav>
+          <div class="menu__contacts">
+            {phones.map((p) => <a class="menu__phone" href={p.href}>{p.display}</a>)}
+            <p class="menu__hours">{hours.map((h) => `${h.days} ${h.time}`).join(", ")}</p>
+            <div class="menu__msg">
+              <a class="btn btn--outline" href={viber}><Icon name="viber" /><span>Viber</span></a>
+              <a class="btn btn--outline" href={whatsapp}><Icon name="whatsapp" /><span>WhatsApp</span></a>
+            </div>
+          </div>
+        </div>
+      </details>
+    </div>
+  </div>
+</header>

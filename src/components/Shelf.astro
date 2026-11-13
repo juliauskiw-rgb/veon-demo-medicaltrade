@@ -1,0 +1,56 @@
+---
+// Signature «полиця»: real client products on white tablets standing on one 8 px brand bar (concept §5, §8.3, §8.10).
+// Columns follow the real proportions of each item, so tablets differ in width and height (no identical cards).
+import { Image } from "astro:assets";
+import type { Product } from "../data/site";
+import { viber } from "../data/site";
+
+interface Props {
+  products: Product[];
+  variant: "hero" | "band";
+  /** approximate share of the viewport the whole shelf takes: [desktop, mobile] */
+  vw: [number, number];
+  label: string;
+}
+const { products, variant, vw, label } = Astro.props;
+const total = products.reduce((s, p) => s + p.w, 0);
+const cols = products.map((p) => `minmax(0, ${p.w}fr)`).join(" ");
+const isHero = variant === "hero";
+---
+<div class:list={["shelf", `shelf--${variant}`]} style={`--cols: ${cols}; --count: ${products.length};`} role="list" aria-label={label}>
+  {products.map((p, i) => {
+    const share = (p.w * (p.fit ?? 1)) / total;
+    const sizes = `(min-width: 1100px) ${Math.ceil(share * vw[0])}vw, ${Math.ceil(share * vw[1])}vw`;
+    const widths = [200, 400, 800].filter((w) => w < p.img.width).concat(p.img.width);
+    const img = (
+      <Image
+        src={p.img}
+        alt={p.alt}
+        widths={widths}
+        sizes={sizes}
+        format="webp"
+        quality={78}
+        loading={isHero && i < 3 ? "eager" : "lazy"}
+        fetchpriority={isHero && i === 0 ? "high" : undefined}
+        decoding="async"
+      />
+    );
+    return (
+      <figure class="shelf__item" role="listitem" style={`--i: ${i}; grid-column: ${i + 1};${p.fit ? ` --fit: ${p.fit};` : ''}`}>
+        {isHero ? (
+          <div class="shelf__tablet">{img}</div>
+        ) : (
+          <a class="shelf__tablet shelf__link" href={viber} aria-label={`Замовити у Viber: ${p.name}, ${p.brand}`}>
+            {img}
+            <span class="shelf__order" aria-hidden="true">Замовити у Viber</span>
+          </a>
+        )}
+        <figcaption class="shelf__caption">
+          <span class="shelf__name">{p.name.split(" ").map((w, i) => (<>{i > 0 && " "}{w.includes("-") ? <span class="nowrap">{w}</span> : w}</>))}</span>
+          <span class="shelf__brand">{p.brand}</span>
+        </figcaption>
+      </figure>
+    );
+  })}
+  <span class="shelf__bar bar" data-reveal aria-hidden="true"></span>
+</div>
